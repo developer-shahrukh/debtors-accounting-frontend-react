@@ -1,38 +1,10 @@
-.App {
-  text-align: center;
-}
-
-.App-logo {
-  height: 40vmin;
-  pointer-events: none;
-}
-
-@media (prefers-reduced-motion: no-preference) {
-  .App-logo {
-    animation: App-logo-spin infinite 20s linear;
-  }
-}
-
-.App-header {
-  background-color: #282c34;
-  min-height: 100vh;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  font-size: calc(10px + 2vmin);
-  color: white;
-}
-
-.App-link {
-  color: #61dafb;
-}
-
-@keyframes App-logo-spin {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
+.sidebar {
+  height: 100%; /* Make sidebar take full height of the viewport */
+  width: 250px; /* Set desired width for the sidebar */
+  position: fixed; /* Fixed positioning so it stays visible while scrolling */
+  top: 0; /* Align to the top of the viewport */
+  left: 0; /* Align to the left side of the viewport */
+  background-color: #333; /* Example background color */
+  padding-top: 20px; /* Optional padding for top */
+  /* Add more styles as needed */
 }

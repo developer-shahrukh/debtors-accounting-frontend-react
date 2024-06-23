@@ -1,0 +1,19 @@
+.mainContainer
+{
+    width:20%;
+    height:520px;
+    border:1px solid gray;
+    background:rgb(27,27,87);
+    top:0;
+    left:0;
+    right:0;
+    bottom:0;
+}
+.heading
+{
+    color:white;
+    padding:10px;
+    top:0;
+    right:0;
+    left:0;
+}
