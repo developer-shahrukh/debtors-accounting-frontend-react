@@ -1,15 +1,24 @@
 import React from 'react';
 import Items from "./components/Items";
-import "./Front.css"
-
+import Header from "./components/Header";
+import Customers from "./components/Customers";
+import Traders from './components/Traders';
+import Invoices from './components/Invoices';
+import Menu from './components/Menu';
+import { BrowserRouter as Router,Route, Routes} from 'react-router-dom';
 const App=()=>{
-    return(
-       <div class="mainContainer">
-        <div class="content">
-            <h1 class="heading">Debtors</h1>
+   return(
+       <Router>
+        <div>
+            <Header/>
+            <Routes>
+                <Route path='Items' element={<Items/>}/>
+                <Route path='Customers' element={<Customers/>}/>
+                <Route path='Traders' element={<Traders/>}/>
+                <Route path='Invoices' element={<Invoices/>}/>
+            </Routes>
         </div>
-       </div>
+       </Router>
     )
-
 };
 export default App;
