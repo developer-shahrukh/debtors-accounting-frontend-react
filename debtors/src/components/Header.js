@@ -11,7 +11,7 @@ import {Link} from 'react-router-dom';
 const myStyles=()=>{ return ({
     mainContainer: {
         flexGrow: 1,
-        color: 'blue'
+        color: 'blue',
     },
     contentSection : {
         marginTop :"80px"

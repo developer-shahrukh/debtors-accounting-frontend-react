@@ -7,6 +7,7 @@ import DialogActions from '@material-ui/core/DialogActions';
 import TextField from '@material-ui/core/TextField';
 import Snackbar from '@material-ui/core/Snackbar';
 import AddIcon from '@material-ui/icons/Add';
+import Box from '@material-ui/core/Box';
 
 // The following is just for testing
 const items=[];
@@ -18,7 +19,7 @@ const ItemAddForm=()=>{
     const [cgst,setCgst]=React.useState("");
     const [sgst,setSgst]=React.useState("");
     const [igst,setIgst]=React.useState("");
-
+    const [uoms,setUoms]=React.useState([]);
     const [snackbarOpenState,setSnackbarOpenState]=React.useState("");
     const [snackbarMessage,setSnackbarMessage]=React.useState("");
 
@@ -104,7 +105,6 @@ const ItemAddForm=()=>{
                     onChange={(ev)=>{setIgst(ev.target.value);}}
                     require
                     fullWidth/>
-
                 </DialogContent>
                 <DialogActions>
                     <Button variant='contained' color='primary' onClick={item}>Add</Button>

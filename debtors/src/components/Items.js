@@ -1,5 +1,8 @@
 import React from 'react';
 import { makeStyles } from '@mui/styles';
+import Paper from '@material-ui/core/Paper';
+import TableContainer from '@material-ui/core/TableContainer';
+import TablePagination from '@material-ui/core/TablePagination';
 import Table from '@material-ui/core/Table';
 import TableHead from '@material-ui/core/TableHead';
 import TableBody from '@material-ui/core/TableBody';
@@ -15,11 +18,12 @@ const myStyles=makeStyles((theme)=>{
     return ({
     mainContainer: {
         flexGrow:1,
-        marginTop:"65px",
-        height:"600px",
+        marginTop:"70px",
         padding:"20px",
         margin:"10px",
-        border:"1px solid black"
+        border:"1px solid black",
+        borderRadius:"50px",
+        background: "#e1eaf5"
     },
     content:{
         padding: "10px",
@@ -47,14 +51,51 @@ const myStyles=makeStyles((theme)=>{
         cusrsor:"pointer",
     },
     detailsPanel:{
-        marginTop:"40px",
+        display:"flex",
+        height: "175px",
         border: "1px solid black",
-        height: "150px",
-        padding:"5px"
+        borderRadius:"40px",
+        margin:"200px",
+        marginTop: "5px"
     },
-    detailsContent:{
+    detailsContentLeft:{
         padding: "10px",
-        fontWeight:"bold",
+        fontWeight:"600",
+        dispaly:"flex",
+        height:"140px",
+        width: "50%",
+        margin:"5px",   
+    },
+    itemHeading:{
+        marginLeft:"200px",
+        padding:"10px",
+        color:"white",
+        background: "gray",
+    },
+    detailsContentRight:{
+        padding: "10px",
+        fontWeight:"600",
+        dispaly:"flex",
+        height:"140px",
+        width: "50%",
+        margin:"5px",
+        textAlign:"center",
+        
+    },
+    uom:{
+        border: "1px solid black",  
+        borderRadius: "20px",
+        height:"140px",
+        width:"70%",
+        textAlign:"center",
+        overflow:"auto",
+        
+    },
+    uomHeading:{
+        color:"white",
+        background:"gray",
+        padding:"2px",
+        marginTop: "10px",
         
     }
 })
@@ -77,7 +118,7 @@ const getItems=()=>{
     
 const getByCode=(code)=>{
     var promise=new Promise((resolve,reject)=>{
-        fetch(`/getByCode?code=${code}`).then((response)=>{
+        fetch(`/getByCode?code=/${code}`).then((response)=>{
             if(!response.ok) throw Error("Unable to fetch data,try after some time");
                 return response.json();
             }).then((item)=>{
@@ -94,41 +135,68 @@ const getByCode=(code)=>{
 const editItem=(ev)=>{
     alert(ev.currentTarget.id);
 }
-const deleteItem=(ev)=>{
-    //alert('delete click '+ev.currentTarget.id);
-}
 
-const ItemSelected=(ev)=>{
-    //alert('Item Id '+ev.currentTarget.id);
-    var code=ev.currentTarget.id;
-    getByCode(code).then((item)=>{
-      console.log(item);
-    });
-}
 
 const Items=(()=>{
 
     const [items,setItems]=React.useState([]);
     const [showProgress,setShowProgress]=React.useState(true);
-    
+    const [selectedItemCode,setSelectedItemCode]=React.useState(0);
+
+    const [pageSize,setPageSize]=React.useState(5);
+    const [pageNumber,setPageNumber]=React.useState(1);
+
     const styleClasses=myStyles();
 
     React.useEffect(()=>{
         getItems().then((items)=>{
             setItems(items);
-            setShowProgress(false);            
+            setShowProgress(false); 
         });
     },[]);
 
+    const deleteItem=(ev)=>{
+        var code=ev.currentTarget.id;
+        console.log('delete click '+code);
+        console.log(items);    
+        fetch(`deleteItem/${code}`,{
+            method: "DELETE",
+        })
+        .then((response)=>{
+            if(response.ok){
+               setItems(items.filter(item=>item.code!=code));
+            }
+        })
+        .catch((error)=>{
+            console.log(error);
+        });
+    } // delete function ends here 
 
-    return (
-        <div className={styleClasses.mainContainer}>
+    
+    const onPageSizeChanged=(ev)=>{
+        setPageSize(ev.target.value);
+        setPageNumber(1);
+    }
+
+    const onPageChanged=(ev,pg)=>{
+        setPageNumber(pg+1);
+    }
+
+    const ItemSelected=(ev)=>{
+        //alert('Item Id '+ev.currentTarget.id);
+        setSelectedItemCode(ev.currentTarget.id);
+    }
+    
+    const UpdateItemTable=()=>{
+        return(
+            <div className={styleClasses.mainContainer}>
             <div className={styleClasses.mainHeading}>Debtors Accounting</div>
             <div className={styleClasses.content}>
                 <h1>Items Details</h1>
                 <div style={{float:"right"}}>
                     <ItemAddForm/>
                 </div>
+                <TableContainer>
                 <Table>
                     <TableHead>
                         <TableRow>
@@ -140,10 +208,10 @@ const Items=(()=>{
                         </TableRow>
                     </TableHead>
                     <TableBody>
-                        {items.map((item,idx)=>{
+                        {items.slice((pageNumber-1)*pageSize,(pageNumber-1)*pageSize+pageSize).map((item,idx)=>{
                             return(
                                 <TableRow className={styleClasses.tableData} onClick={ItemSelected} id={item.code}>
-                                    <TableCell align='right'>{idx+1}</TableCell>
+                                    <TableCell align='right'>{(pageNumber-1)*pageSize+(idx+1)}</TableCell>
                                     <TableCell>{item.name}</TableCell>
                                     <TableCell>{item.hsnCode}</TableCell>
                                     <TableCell><FontAwesomeIcon icon={faEdit} style={{cursor:"pointer"}} id={item.code} onClick={editItem}/></TableCell>
@@ -153,26 +221,55 @@ const Items=(()=>{
                         })}
                     </TableBody>
                 </Table>
+
+            </TableContainer>
+            <TablePagination
+            component="div"
+            rowsPerPageOptions={[5,10,15,20,25]}
+            count={items.length}
+            rowsPerPage={pageSize}
+            page={pageNumber-1}
+            onChangePage={onPageChanged}
+            onChangeRowsPerPage={onPageSizeChanged}
+            />
+            
                 {showProgress && <CircularProgress/>}
             </div>
-           <ItemDetails/>
+          {selectedItemCode!=0 && <ItemDetails/>}
         </div>
+        )
+    }
+
+
+    const ItemDetails=()=>{
+        const item=items.find(i=>i.code==selectedItemCode);
+        console.log(item);
+        const styleClasses=myStyles();
+        return(
+            <div className={styleClasses.detailsPanel}>
+                <div className={styleClasses.detailsContentLeft}>
+                    <span className={styleClasses.itemHeading}>Item Details</span><br/>
+                    <span className={styleClasses.detailsContent}>Item Name : {item.name}</span><br/>
+                    <span className={styleClasses.detailsContent}>HSN Code : {item.hsnCode}</span><br/>
+                    <span className={styleClasses.detailsContent}>CGST : {item.cgst}</span><br/>
+                    <span className={styleClasses.detailsContent}>SGST : {item.sgst}</span><br/>
+                    <span className={styleClasses.detailsContent}>IGST : {item.igst}</span><br/>
+                </div>
+                <div className={styleClasses.detailsContentRight}>
+                    <div className={styleClasses.uom} >
+                        <span className={styleClasses.uomHeading}>Unit of Measurements</span><br/>
+                            
+                    </div>
+                </div>
+            </div>
+        )
+    }
+    
+    return (
+        <UpdateItemTable/>
     );    
 });
 
 
-const ItemDetails=(item)=>{
-
-    const styleClasses=myStyles();
-    return(
-        <div className={styleClasses.detailsPanel}>
-            <span className={styleClasses.detailsContent}>Item Name : </span><br/>
-            <span className={styleClasses.detailsContent}>HSN Code : </span><br/>
-            <span className={styleClasses.detailsContent}>CGST : </span><br/>
-            <span className={styleClasses.detailsContent}>SGST : </span><br/>
-            <span className={styleClasses.detailsContent}>IGST : </span><br/>
-        </div>
-    )
-}
 
 export default Items;
