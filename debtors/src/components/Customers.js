@@ -9,10 +9,10 @@ import EditIcon from '@material-ui/icons/Edit';
 import UpdateIcon from '@material-ui/icons/Update';
 import DeleteIcon from '@material-ui/icons/Delete';
 import CustomerAddForm from './CustomerAddForm';
-//import Select from '@material-ui/core/Select';
-//import MenuItem from '@material-ui/core/MenuItem';
 import { Select, MenuItem, FormControl, InputLabel, Snackbar, } from '@material-ui/core';
-import Alert from '@material-ui/lab/Alert';
+
+import AlertMessage from './AlertMessage';
+
 
 
 const myStyles=makeStyles((theme)=>{
@@ -72,6 +72,24 @@ const myStyles=makeStyles((theme)=>{
         },
         button:{
             padding:"10px",
+        },
+        heading:{
+            fontSize: "24pt",
+            fontWeight: "bold",
+            color: "#2222aa",
+            margin:"10px",
+            textAlign:"center"
+        },
+        noRecord:{
+            color:"red",
+            background:"#e0d2ab",
+            listStyle:"none",
+            textAlign:"center",
+            padding:"10px",
+            margin:"5px",
+            borderRadius: "20px",
+            fontSize: "18pt",
+            fontWeight: "600"
         }
         
     })
@@ -128,6 +146,7 @@ const Customers=(()=>{
     const [customers,setCustomers]=React.useState([]);
     const [states,setStates]=React.useState([]);
     const [selectedState,setSelectedState]=React.useState(0);
+    
 
     const [selectedCustomer,setSelectedCustomer]=React.useState();
     const [activeButton,setActiveButton]=React.useState(true);
@@ -135,9 +154,10 @@ const Customers=(()=>{
     
     const [isEditing,setIsEditing]=React.useState(true);
     const [message,setMessage]=React.useState("");
-    const [openSnackBar,setOpenSnackBar]=React.useState(false);
+    const [openState,setOpenState]=React.useState(false);
+    const [alertType,setAlertType]=React.useState("");
 
-    const [code,setCode]=React.useState("");
+    const [customerCode,setCustomerCode]=React.useState("");
     const [name,setName]=React.useState("");
     const [address,setAddress]=React.useState("");
     const [stateCode,setStateCode]=React.useState("");
@@ -148,6 +168,7 @@ const Customers=(()=>{
     const [home,setHome]=React.useState("");
     const [office,setOffice]=React.useState("");
 
+    const newCustomerRef=React.useRef(null);
 
     React.useEffect(()=>{
         getCustomers().then((customers)=>{
@@ -162,13 +183,14 @@ const Customers=(()=>{
     const stateChange=(ev)=>{
         setSelectedState(ev.target.value);
     }
+
+    const openAlert=()=>{
+        setOpenState(true);
+    }
+    const closeAlert=()=>{
+        setOpenState(false);
+    }
     
-    const snackBarClose=()=>{
-        setOpenSnackBar(true);
-    }
-    const snackBarOpen=()=>{
-        setOpenSnackBar(false);
-    }
 
     const editCustomer=(ev)=>{
         setInputDisabled(false);
@@ -179,7 +201,7 @@ const Customers=(()=>{
         //alert(personal+","+home+","+office);
         //alert(selectedState);
         const customerData={
-            "code": code,
+            "code": customerCode,
             "name": name,
             "address": address,
             "stateCode": selectedState,
@@ -204,11 +226,13 @@ const Customers=(()=>{
                 body: JSON.stringify(customerData)
             }).then((response)=>{
             if(response.ok){
-                console.log(response);
                 setInputDisabled(true);
                 setActiveButton(true);
                 setIsEditing(true);
-                const index=customers.findIndex(customer=>customer.code==code);
+                setOpenState(true);
+                setAlertType("success");
+                setMessage("Customer Updated");
+                const index=customers.findIndex(customer=>customer.code==customerCode);
                 const updatedCustomers=[...customers];
                 if(index!==-1) updatedCustomers.splice(index,1);
                 updatedCustomers.push(customerData);
@@ -221,16 +245,19 @@ const Customers=(()=>{
         });
     }
     const deleteCustomer=(ev)=>{
-        fetch(`/deleteCustomer/${code}`,
+        fetch(`/deleteCustomer/${customerCode}`,
             {
                 method: "DELETE",
             }).then((response)=>{
             if(response.ok){
-                console.log(response);
+                //console.log(response);
                 setInputDisabled(true);
                 setIsEditing(true);
                 setActiveButton(true);
-                const index=customers.findIndex(customer=>customer.code==code);
+                setOpenState(true);
+                setAlertType("success");
+                setMessage("Customer deleted with code : "+customerCode);
+                const index=customers.findIndex(customer=>customer.code==customerCode);
                 //const updatedCustomers=[...customers];
                 if(index!==-1) customers.splice(index,1);
                 setCustomers(customers);
@@ -250,19 +277,23 @@ const Customers=(()=>{
         setActiveButton(false);
          var code=ev.currentTarget.id;
          setSelectedCustomer(code);
-         setCode(code);
+         setCustomerCode(code);
          /*getCustomerByCode(code).then((customer)=>{
             console.log(customer);
          });*/
-         fillCustomerForm(customers.find(customer=>customer.code==code));
+         const customer=customers.find(customer=>customer.code==customerCode);
+         console.log(customer);
+         fillCustomerForm(customer);
      }
 
      const fillCustomerForm=(customer)=>{
         clearFormData();
+        if(!customer) return;
         //console.log(customer);
-        const stateCode=customer.stateCode;
-        setSelectedState(stateCode);
-        const state=states.find(s=>s.code==stateCode);
+        //console.log(customer);
+        const code=customer.stateCode;
+        setSelectedState(code);
+        const state=states.find(s=>s.code==code);
         setName(customer.name.trim().length==0 ? "" : customer.name.trim());
         setAddress(customer.address.trim().length==0 ? "" : customer.address.trim());
         setStateCode(state.name.trim().length==0 ? "" : state.name.trim());
@@ -288,11 +319,22 @@ const Customers=(()=>{
    
     return (
         <div className={styleClasses.mainContainer}>
+            
             <div className={styleClasses.leftContainer}>
+            <h1 className={styleClasses.heading}>Customers Details</h1>
                 {
-                    customers.map((customer)=>{
+                    customers.length==0 ?<li className={styleClasses.noRecord}>Oops! No Record Found</li> :
+                    customers.map((customer,index)=>{
                         return(
-                            <li className={styleClasses.li} id={customer.code} onClick={customerSelected} hover>{customer.name}
+                            
+                            <li 
+                                className={styleClasses.li}
+                                id={customer.code} 
+                                onClick={customerSelected}
+                                hover
+                                key={customer.code}
+                                ref={index==customers.length-1 ? newCustomerRef : null}
+                                >{customer.name}
                             <br/>
                             <span>{customer.address}</span>
                             </li>
@@ -302,7 +344,22 @@ const Customers=(()=>{
             </div>
             <div className={styleClasses.rightContainer}>
                 <div className={styleClasses.divButton}>
-                    <CustomerAddForm/>
+                    <CustomerAddForm 
+                        states={states}
+                        customers={customers}
+                        setStates={setStates}
+                        setCustomers={setCustomers}
+                        openState={openState}
+                        setOpenState={setOpenState}
+                        setMessage={setMessage}
+                        setAlertType={setAlertType}
+                        AlertMessage={AlertMessage}
+                        clearFormData={clearFormData}
+                        setInputDisabled={setInputDisabled}
+                        setActiveButton={setActiveButton}
+                        setIsEditing={setIsEditing}
+                        newCustomerRef={newCustomerRef}
+                    />
                    {isEditing && <Button className={styleClasses.button} variant='contained' color='primary' disabled={activeButton} onClick={editCustomer}><EditIcon/></Button>}
                     {!isEditing && <Button className={styleClasses.button} variant='contained' color='primary' disabled={activeButton} onClick={updateCustomer}><UpdateIcon/>Update</Button>}
                     <Button className={styleClasses.button} variant='contained' color='primary' disabled={activeButton} onClick={deleteCustomer}><DeleteIcon/></Button>
@@ -344,38 +401,31 @@ const Customers=(()=>{
                 </DialogContent>
         
             </div>
-            <Snackbar
-                open={snackBarOpen}
-                onClose={snackBarClose}
+            <AlertMessage
+                openState={openState}
+                duration={3000}
+                horizontalAlignment="center"
+                verticalAlignment="bottom"
+                onClose={closeAlert}
+                alertType={alertType}
                 message={message}
-                anchorOrigin={{vertical:'bottom',horizontal:"center"}}
-                autoHideDuration={4000}>
-                <Alert
-                    elevation={4}
-                    variant='filled'
-                    severity='success'
-                    onClose={false}
-                    >
-                    {message}
-                </Alert>
-            </Snackbar>
-
+            />
         </div>
     )
 });
 
 
-const InputForm=({title,required,onChange,value,disabled})=>{
+const InputForm=(props)=>{
     return (
         <div>
     <TextField
-        label={title}
-        required={required}
+        label={props.title}
+        required={props.required}
         variant="outlined"
-        onChange={onChange}
-        id={title}  
-        value={value}
-        disabled={disabled}
+        onChange={props.onChange}
+        id={props.title}  
+        value={props.value}
+        disabled={props.disabled}
         />
         </div>
     )

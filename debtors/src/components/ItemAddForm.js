@@ -8,11 +8,12 @@ import TextField from '@material-ui/core/TextField';
 import Snackbar from '@material-ui/core/Snackbar';
 import AddIcon from '@material-ui/icons/Add';
 import Box from '@material-ui/core/Box';
+import { ArrowBackIos, ArrowForwardIos } from '@material-ui/icons';
+import './CSS/ItemAddForm.css'
+import AlertMessage from './AlertMessage';
 
-// The following is just for testing
-const items=[];
 
-const ItemAddForm=()=>{
+const ItemAddForm=(props)=>{
     const [itemDialogState,setItemDialogState]=React.useState(false);
     const [itemName,setItemName]=React.useState("");
     const [hsnCode,setHsnCode]=React.useState("");
@@ -23,39 +24,87 @@ const ItemAddForm=()=>{
     const [snackbarOpenState,setSnackbarOpenState]=React.useState("");
     const [snackbarMessage,setSnackbarMessage]=React.useState("");
 
-    function openItemDialog()
-    {
+
+    const [leftList, setLeftList] = React.useState([props.uoms]);
+    const [rightList, setRightList] = React.useState([]);
+    const [selectedRightItems, setSelectedRightItems] =React.useState([]);
+    const [selectedLeftItems, setSelectedLeftItems] =React.useState([]);
+
+    React.useEffect(() => {
+        setLeftList(props.uoms);
+        props.setOpenState(false);
+      }, []);
+    
+      const handleSelectRightItem = (item) => {
+        setSelectedRightItems(prevSelectedItems => {
+          if (prevSelectedItems.includes(item)) {
+            return prevSelectedItems.filter(i => i !== item);
+          } else {
+            return [...prevSelectedItems, item];
+          }
+        });
+      };
+
+      const handleSelectLeftItem = (item) => {
+        setSelectedLeftItems(prevSelectedItems => {
+          if (prevSelectedItems.includes(item)) {
+            return prevSelectedItems.filter(i => i !== item);
+          } else {
+            return [...prevSelectedItems, item];
+          }
+        });
+      };
+    
+      const handleMoveToRight = () => {
+        setRightList(prevRightList => [...prevRightList, ...selectedRightItems]);
+        setLeftList(prevLeftList => prevLeftList.filter(item => !selectedRightItems.includes(item)));
+        setSelectedRightItems([]);
+      };
+    
+      const handleMoveToLeft = () => {
+        setLeftList(prevLeftList => [...prevLeftList, ...selectedLeftItems]);
+        setRightList(prevRightList => prevRightList.filter(item => !selectedLeftItems.includes(item)));
+        setSelectedLeftItems([]);
+      };
+    
+    const openItemDialog=()=>{
         setItemDialogState(true);
     }
-    function clearItemForm()
+    const clearItemForm=()=>
     {
         setItemName("");
         setHsnCode("");
+        setCgst("");
+        setSgst("");
+        setIgst("");
+        setRightList([]);
     }
-    function closeItemDialog()
-    {
+    const closeItemDialog=()=>{
         setItemDialogState(false);
         clearItemForm();
     }
-    function closeSnackbar()
-    {
+    const closeSnackbar=()=>{
         setSnackbarOpenState(false);
         setSnackbarMessage("");
     }
-    function item()
-    {
-        if(itemName.length===0) 
+    const addItem=()=>{
+        if(itemName.length==0) 
         {
-            alert('Enter username ');
+            props.setOpenState(true);
+            props.setMessage("Name required");
+            props.setAlertType("error");
             return;
         }
-        if(items.find((item)=> item==item.name))
+        if(props.items.find((item)=> item==item.name))
         {
             alert(`${itemName} exists`);
         }
         else
         {
-            items.push(itemName);
+            //props.items.push(itemName);
+            alert(itemName+","+hsnCode);
+            alert(cgst+","+sgst+","+igst);
+            console.log(rightList);
             setSnackbarMessage(`Item ${itemName}} added`);
             setSnackbarOpenState(true);
             closeItemDialog();            
@@ -105,9 +154,41 @@ const ItemAddForm=()=>{
                     onChange={(ev)=>{setIgst(ev.target.value);}}
                     require
                     fullWidth/>
+                    <div className={"mainContainer"}>
+                            <div className={"leftContainer"}>
+                                <h3 className={"heading"}>Select From</h3>
+                                {leftList.map(item => (
+                                    <div key={item.code} id={item.code}>
+                                    <input 
+                                        type="checkbox" 
+                                        checked={selectedRightItems.includes(item)} 
+                                        onChange={() => handleSelectRightItem(item)} 
+                                    />
+                                    {item.name}
+                                    </div>
+                                ))}
+                            </div>
+                        <div className={"buttonContainer"}>
+                        <button onClick={handleMoveToRight}><ArrowForwardIos/></button>
+                        <button onClick={handleMoveToLeft}><ArrowBackIos/></button>
+                        </div>
+                        <div className={"rightContainer"}>
+                            <h3 className={"heading"}>Selected</h3>
+                            {rightList.map(item => (
+                                <div key={item.code} id={item.code}>
+                                    <input 
+                                        type="checkbox" 
+                                        checked={selectedLeftItems.includes(item)} 
+                                        onChange={() => handleSelectLeftItem(item)} 
+                                    />
+                                    {item.name}
+                                </div>
+                            ))}
+                        </div>
+                    </div>
                 </DialogContent>
                 <DialogActions>
-                    <Button variant='contained' color='primary' onClick={item}>Add</Button>
+                    <Button variant='contained' color='primary' onClick={addItem}>Add</Button>
                     <Button variant='contained' color='primary' onClick={closeItemDialog}>Cancel</Button>
                 </DialogActions>
             </Dialog>
@@ -116,6 +197,15 @@ const ItemAddForm=()=>{
             message={snackbarMessage}
             onClose={closeSnackbar}
             autoHideDuration={5000}
+            />
+            <AlertMessage
+                openState={props.openState}
+                duration={3000}
+                horizontalAlignment="center"
+                verticalAlignment="bottom"
+                onClose={props.closeAlert}
+                alertType={props.alertType}
+                message={props.message}
             />
         </div>
     );

@@ -18,7 +18,7 @@ const myStyles=makeStyles((them)=>{
             margin:"10px;",
             borderRadius: "5px",
             border:"1px solid black",
-           background: "#e1eaf5"
+            background: "#e1eaf5"
         },
         header:{
             display:"flex",
@@ -129,9 +129,9 @@ const Traders =(()=>{
         getStates().then((states)=>{
             //console.log(states);
              setStates(states);
-             fillForm();
+             
          });
-        
+         fillForm();
     },[]);
 
     

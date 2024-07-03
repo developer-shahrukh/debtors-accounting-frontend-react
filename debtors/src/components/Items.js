@@ -12,7 +12,7 @@ import CircularProgress from '@material-ui/core/CircularProgress';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faEdit,faTrash } from '@fortawesome/free-solid-svg-icons';
 import ItemAddForm from './ItemAddForm';
-
+import AlertMessage from './AlertMessage';
 
 const myStyles=makeStyles((theme)=>{
     return ({
@@ -103,19 +103,33 @@ const myStyles=makeStyles((theme)=>{
 
 
 const getItems=()=>{
-        var promise=new Promise((resolve,reject)=>{
-            fetch("/getItems").then((response)=>{
-                if(!response.ok) throw Error("Unable to fetch data,try after some time");
-                return response.json();
-            }).then((items)=>{
-                resolve(items);
-            }).catch((error)=>{
-                reject(error);
-            });
+    var promise=new Promise((resolve,reject)=>{
+        fetch("/getItems").then((response)=>{
+            if(!response.ok) throw Error("Unable to fetch data,try after some time");
+            return response.json();
+        }).then((items)=>{
+            resolve(items);
+        }).catch((error)=>{
+            reject(error);
         });
-        return promise;
-    }
+    });
+    return promise;
+}
     
+const getUoms=()=>{
+    var promise=new Promise((resolve,reject)=>{
+        fetch("/getUoms").then((response)=>{
+            if(!response.ok) throw Error("Unable to fetch data,try after some time");
+            return response.json();
+        }).then((uoms)=>{
+            resolve(uoms);
+        }).catch((error)=>{
+            reject(error);
+        });
+    });
+    return promise;
+}
+
 const getByCode=(code)=>{
     var promise=new Promise((resolve,reject)=>{
         fetch(`/getByCode?code=/${code}`).then((response)=>{
@@ -140,8 +154,13 @@ const editItem=(ev)=>{
 const Items=(()=>{
 
     const [items,setItems]=React.useState([]);
+    const [uoms,setUoms]=React.useState([]);
     const [showProgress,setShowProgress]=React.useState(true);
     const [selectedItemCode,setSelectedItemCode]=React.useState(0);
+
+    const [message,setMessage]=React.useState("");
+    const [openState,setOpenState]=React.useState(false);
+    const [alertType,setAlertType]=React.useState("");
 
     const [pageSize,setPageSize]=React.useState(5);
     const [pageNumber,setPageNumber]=React.useState(1);
@@ -153,7 +172,17 @@ const Items=(()=>{
             setItems(items);
             setShowProgress(false); 
         });
+        getUoms().then((uoms)=>{
+            setUoms(uoms);
+        });
     },[]);
+
+    const openAlert=()=>{
+        setOpenState(true);
+    }
+    const closeAlert=()=>{
+        setOpenState(false);
+    }
 
     const deleteItem=(ev)=>{
         var code=ev.currentTarget.id;
@@ -194,7 +223,16 @@ const Items=(()=>{
             <div className={styleClasses.content}>
                 <h1>Items Details</h1>
                 <div style={{float:"right"}}>
-                    <ItemAddForm/>
+                    <ItemAddForm
+                        setItem={setItems}
+                        items={items}
+                        openState={openState}
+                        setOpenState={setOpenState}
+                        setMessage={setMessage}
+                        setAlertType={setAlertType}
+                        AlertMessage={AlertMessage}
+                        uoms={uoms}
+                    />
                 </div>
                 <TableContainer>
                 <Table>
@@ -208,7 +246,8 @@ const Items=(()=>{
                         </TableRow>
                     </TableHead>
                     <TableBody>
-                        {items.slice((pageNumber-1)*pageSize,(pageNumber-1)*pageSize+pageSize).map((item,idx)=>{
+                        {items.length==0 ? <TableCell colSpan={5} style={{color:"red",textAlign:"center",fontSize:"26pt",background:"#e0d2ab",borderRadius:"40px"}}>Oops! No Record Found</TableCell>:
+                        items.slice((pageNumber-1)*pageSize,(pageNumber-1)*pageSize+pageSize).map((item,idx)=>{
                             return(
                                 <TableRow className={styleClasses.tableData} onClick={ItemSelected} id={item.code}>
                                     <TableCell align='right'>{(pageNumber-1)*pageSize+(idx+1)}</TableCell>
@@ -261,6 +300,15 @@ const Items=(()=>{
                             
                     </div>
                 </div>
+                <AlertMessage
+                    openState={openState}
+                    duration={3000}
+                    horizontalAlignment="center"
+                    verticalAlignment="bottom"
+                    onClose={closeAlert}
+                    alertType={alertType}
+                    message={message}
+                />
             </div>
         )
     }
