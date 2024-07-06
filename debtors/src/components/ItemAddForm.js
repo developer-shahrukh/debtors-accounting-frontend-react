@@ -15,7 +15,7 @@ import AlertMessage from './AlertMessage';
 
 const ItemAddForm=(props)=>{
     const [itemDialogState,setItemDialogState]=React.useState(false);
-    const [itemName,setItemName]=React.useState("");
+    const [name,setName]=React.useState("");
     const [hsnCode,setHsnCode]=React.useState("");
     const [cgst,setCgst]=React.useState("");
     const [sgst,setSgst]=React.useState("");
@@ -24,6 +24,20 @@ const ItemAddForm=(props)=>{
     const [snackbarOpenState,setSnackbarOpenState]=React.useState("");
     const [snackbarMessage,setSnackbarMessage]=React.useState("");
 
+    const [formError,setFormError]=React.useState("");
+    const[isName,setIsName]=React.useState(false);
+    const [isHsnCode,setIsHsnCode]=React.useState(false);
+    const [isCgst,setIsCgst]=React.useState(false);
+    const [isSgst,setIsSgst]=React.useState(false);
+    const [isIgst,setIsIgst]=React.useState(false);
+    //const [hashError,setHashError]=React.useState(false);
+
+    const [nameError,setNameError]=React.useState("");
+    const [hsnCodeError,setHsnCodeError]=React.useState("");
+    const [cgstError,setCgstError]=React.useState("");
+    const [sgstError,setSgstError]=React.useState("");
+    const [igstError,setIgstError]=React.useState("");
+    const [uomsError,setUomsError]=React.useState("");
 
     const [leftList, setLeftList] = React.useState([props.uoms]);
     const [rightList, setRightList] = React.useState([]);
@@ -67,48 +81,137 @@ const ItemAddForm=(props)=>{
         setSelectedLeftItems([]);
       };
     
+    
+
     const openItemDialog=()=>{
         setItemDialogState(true);
     }
-    const clearItemForm=()=>
+    const clearFormData=()=>
     {
-        setItemName("");
+        setName("");
         setHsnCode("");
         setCgst("");
         setSgst("");
         setIgst("");
         setRightList([]);
     }
+    const clearAllErrors=()=>{
+        setFormError("");
+        setNameError("");
+        setHsnCodeError("");
+        setCgstError("");
+        setSgstError("");
+        setIgstError("");
+        setUomsError("");
+        setIsName(false);
+        setIsHsnCode(false);
+        setIsCgst(false);
+        setIsSgst(false);
+        setIsIgst(false);
+        //setHashError(false);
+    }
+    const validateForm=()=>{
+        var hashError=false;
+        console.log('Before validation : '+hashError);
+        if(!name || name.length==0){
+            hashError=true;
+            setIsName(true);
+            setNameError("Item Name required");
+        }
+        if(!hsnCode || hsnCode==0){
+            hashError=true;
+            setIsHsnCode(true);
+            setHsnCodeError("HSN Code cannot be zero");
+        }
+        if(!cgst){
+            hashError=true;
+            setIsCgst(true);
+            setCgstError("CGST required");
+        }
+        if(cgst.length>2){
+            hashError=true;
+            setIsCgst(true);
+            setCgstError("CGST only 2 digit");
+        }
+        if(!sgst){
+            hashError=true;
+            setIsSgst(true);
+            setSgstError("SGST required");
+        }
+        if(sgst.length>2){
+            hashError=true;
+            setIsSgst(true);
+            setSgstError("SGST only 2 digit");
+        }
+        if(!igst){
+            hashError=true;
+            setIsIgst(true);
+            setIgstError("IGST required");
+        }
+        if(igst.length>2){
+            hashError=true;
+            setIsIgst(true);
+            setIgstError("IGST only 2 digit");
+        }
+        if(!rightList.length){
+            hashError=true;
+            setUomsError("Select at least one uom");
+        }
+        console.log('After validation : '+hashError);
+        return hashError;
+    }
     const closeItemDialog=()=>{
         setItemDialogState(false);
-        clearItemForm();
+        clearFormData();
     }
     const closeSnackbar=()=>{
         setSnackbarOpenState(false);
         setSnackbarMessage("");
     }
     const addItem=()=>{
-        if(itemName.length==0) 
-        {
-            props.setOpenState(true);
-            props.setMessage("Name required");
-            props.setAlertType("error");
+        clearAllErrors();
+        var code=0;
+       /* if(validateForm()){
+            console.log('Inner Validate Condition');
             return;
-        }
-        if(props.items.find((item)=> item==item.name))
-        {
-            alert(`${itemName} exists`);
-        }
-        else
-        {
-            //props.items.push(itemName);
-            alert(itemName+","+hsnCode);
-            alert(cgst+","+sgst+","+igst);
-            console.log(rightList);
-            setSnackbarMessage(`Item ${itemName}} added`);
-            setSnackbarOpenState(true);
-            closeItemDialog();            
-        }
+        }*/
+       console.log(props.openState,props.alertType,props.message)
+        var itemData={
+            code : code,
+            name : name,
+            hsnCode : hsnCode,
+            cgst : cgst,
+            sgst : sgst,
+            igst : igst,
+            uom : rightList
+        };
+        fetch("/addItem",{
+            method: "POST",
+            headers: {
+                "Content-type" : "application/json"
+            },
+            body : JSON.stringify(itemData)
+        }).then((response)=>{
+            if(response.ok){
+                console.log(response);
+                setItemDialogState(true);
+                props.openAlert();
+                props.setAlertType("success");
+                props.setMessage(`Item ${name} added`);
+                //const addItem=[...props.items];
+                //addItem.push(itemData);
+                //props.setItems(addItem);
+                console.log(props.openState,props.alertType,props.message)
+                //clearFormData();   
+            }
+        }).catch((error)=>{
+            alert(error.message);
+            setItemDialogState(true);
+            props.openAlert();
+            props.setAlertType("error");
+            props.setMessage(`${error.message}`);
+            clearFormData();   
+        });
     }
    
     return(
@@ -122,37 +225,48 @@ const ItemAddForm=(props)=>{
              disableBackdropClick
              >
                 <DialogTitle>Add Item Form</DialogTitle>
+                <span className={"error"}>{formError}</span>
                 <DialogContent>
                     <TextField
                     required
-                    label="itemName"
-                    value={itemName}
-                    onChange={(ev)=>{setItemName(ev.target.value);}}
+                    label="Item-name"
+                    value={name}
+                    onChange={(ev)=>{setName(ev.target.value);}}
+                    error={isName}
+                    helperText={nameError}
                     fullWidth/>
+                    
                     <TextField
                     required
                     label="hsnCode"
                     value={hsnCode}
                     onChange={(ev)=>{setHsnCode(ev.target.value);}}
+                    error={isHsnCode}
+                    helperText={hsnCodeError}
                     fullWidth/>
                     <TextField
                     required
                     label="cgst"
                     value={cgst}
                     onChange={(ev)=>{setCgst(ev.target.value);}}
+                    error={isCgst}
+                    helperText={cgstError}
                     fullWidth/>
                     <TextField
                     required
                     label="sgst"
                     value={sgst}
                     onChange={(ev)=>{setSgst(ev.target.value);}}
+                    error={isSgst}
+                    helperText={sgstError}
                     fullWidth/>
                     <TextField
                     required
                     label="igst"
                     value={igst}
                     onChange={(ev)=>{setIgst(ev.target.value);}}
-                    require
+                    error={isIgst}
+                    helperText={igstError}
                     fullWidth/>
                     <div className={"mainContainer"}>
                             <div className={"leftContainer"}>
@@ -184,7 +298,9 @@ const ItemAddForm=(props)=>{
                                     {item.name}
                                 </div>
                             ))}
+                            <span className={"error"}>{uomsError}</span>
                         </div>
+                        
                     </div>
                 </DialogContent>
                 <DialogActions>

@@ -61,7 +61,7 @@ const myStyles=makeStyles((them)=>{
 
 const getTraders=()=>{
     var promise=new Promise((resolve,reject)=>{
-        fetch("/getTraders").then((response)=>{
+        fetch("/getTrader").then((response)=>{
             if(!response.ok) throw Error("Unable to fetch data,try after some time");
             return response.json();            
         }).then((traders)=>{

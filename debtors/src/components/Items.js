@@ -67,10 +67,10 @@ const myStyles=makeStyles((theme)=>{
         margin:"5px",   
     },
     itemHeading:{
-        marginLeft:"200px",
         padding:"10px",
-        color:"white",
-        background: "gray",
+        fontSize: "22pt",
+        fontWeight: "bold",
+        color: "#3461a3"
     },
     detailsContentRight:{
         padding: "10px",
@@ -179,6 +179,8 @@ const Items=(()=>{
 
     const openAlert=()=>{
         setOpenState(true);
+        setTimeout(() => {
+        }, 0);
     }
     const closeAlert=()=>{
         setOpenState(false);
@@ -220,18 +222,23 @@ const Items=(()=>{
         return(
             <div className={styleClasses.mainContainer}>
             <div className={styleClasses.mainHeading}>Debtors Accounting</div>
+            <h1 className={styleClasses.itemHeading}>Items Details</h1>
             <div className={styleClasses.content}>
-                <h1>Items Details</h1>
+              
                 <div style={{float:"right"}}>
                     <ItemAddForm
-                        setItem={setItems}
                         items={items}
+                        setItems={setItems}
+                        uoms={uoms}
                         openState={openState}
                         setOpenState={setOpenState}
+                        message={message}
                         setMessage={setMessage}
+                        alertType={alertType}
                         setAlertType={setAlertType}
+                        openAlert={openAlert}
+                        closeAlert={closeAlert}
                         AlertMessage={AlertMessage}
-                        uoms={uoms}
                     />
                 </div>
                 <TableContainer>

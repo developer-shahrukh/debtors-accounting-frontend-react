@@ -49,3 +49,8 @@
     color:white;
     background:rgb(49, 132, 233);
 }
+.error{
+    float:right;
+    color:red;
+    margin:2px;
+}
