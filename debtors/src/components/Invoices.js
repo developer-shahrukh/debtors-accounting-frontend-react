@@ -254,8 +254,9 @@ const Invoices=()=>{
     const [uom,setUom]=React.useState();
 
     React.useEffect(()=>{
-        getTraders().then((trader)=>{
-            setTraders(trader);
+        getTraders().then((traders)=>{
+            console.log(traders);
+            setTraders(traders);
         });
         getStates().then((states)=>{
             setStates(states);           
@@ -369,6 +370,8 @@ const Invoices=()=>{
     const customerChange=(ev)=>{
         setSelectedCustomer(ev.target.value);
         setShowTable(true);
+       var customer=customers.find(c=>c.code==ev.target.value);
+       customer.stateCode==traders.map(t=>{return t.stateCode}) ? setIsSameState(true) : setIsSameState(false);
     }
     const itemChange=(ev)=>{
         setSelectedItems(ev.target.value);
@@ -615,7 +618,9 @@ const Invoices=()=>{
         return(
             <div>
                 {
-                    traders.length==0 ? null : traders.map((trader)=>{return(
+                    !Array.isArray(traders) || !traders.length ? null : traders.map((trader)=>{
+                        if(!trader) return null;
+                        return(                        
                         <div className={styleClasses.customerDetails}>
                             <h3><AccountCircleIcon/>{trader.name}</h3>
                             <span className={styleClasses.data}><HomeIcon/>{trader.address}</span><br/>
@@ -624,9 +629,9 @@ const Invoices=()=>{
                             <span className={styleClasses.data}><CallIcon/>{trader.contact1}</span>&nbsp;&nbsp;
                             <span className={styleClasses.data}>{trader.contact2}</span>&nbsp;&nbsp;  
                             <span className={styleClasses.data}>{trader.contact3}</span><br/>
-                            <h3>Registration number </h3><span className={styleClasses.data}>{trader.regValue1}</span>
-                            <span className={styleClasses.data}>{trader.regValue2}</span>
-                            <span className={styleClasses.data}>{trader.regValue3}</span>
+                            <h3>Registration number </h3><span className={styleClasses.data}>{trader.regValue1}</span>&nbsp;&nbsp;&nbsp;
+                            <span className={styleClasses.data}>{trader.regValue2}</span>&nbsp;&nbsp;&nbsp;
+                            <span className={styleClasses.data}>{trader.regValue3}</span>&nbsp;&nbsp;&nbsp;
                         </div>
                     )})
                 }
@@ -658,7 +663,7 @@ const Invoices=()=>{
                 <label className={styleClasses.selectCustomerLabel}>Select Customer</label>
                 <div>
                     {
-                       customers.map((customer)=>{
+                       !customers.length ? null : customers.map((customer)=>{
                         return(
                             customer.code==selectedCustomer ? 
                             <div className={styleClasses.customerDetails}>
@@ -708,7 +713,7 @@ const Invoices=()=>{
                         <FormHelperText id="invoice-number-helper">Enter invoice number</FormHelperText>
                     </FormControl>
                     <FormControl className={styleClasses.inputField}>
-                        <InputLabel htmlFor="invoice-date">Invoice date</InputLabel>
+                        <InputLabel htmlFor="invoice-date" shrink>Invoice date</InputLabel>
                         <Input className={styleClasses.input} id="invoice-date" name="invoice-date" type="date" />
                         <FormHelperText id="invoice-date-helper">Enter invoice date</FormHelperText>
                     </FormControl>

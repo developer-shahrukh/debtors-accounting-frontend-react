@@ -115,7 +115,20 @@ const getItems=()=>{
     });
     return promise;
 }
-    
+const getItemByCode=(code)=>{
+    var promise=new  Promise((resolve,reject)=>{
+        fetch(`/getByCode?code=${code}`).then((response)=>{
+            if(!response.ok) throw Error("Unable to fetch data,try after some time");
+            return response.json();            
+        }).then((item)=>{
+            resolve(item);
+        }).catch((error)=>{
+            reject(error);
+        });
+    });
+    return promise;
+}
+
 const getUoms=()=>{
     var promise=new Promise((resolve,reject)=>{
         fetch("/getUoms").then((response)=>{
@@ -130,22 +143,6 @@ const getUoms=()=>{
     return promise;
 }
 
-const getByCode=(code)=>{
-    var promise=new Promise((resolve,reject)=>{
-        fetch(`/getByCode?code=/${code}`).then((response)=>{
-            if(!response.ok) throw Error("Unable to fetch data,try after some time");
-                return response.json();
-            }).then((item)=>{
-                resolve(item);
-            }).catch((error)=>{
-                reject(error);
-            });
-        });
-        return promise;
-    }
-   
-
-
 const editItem=(ev)=>{
     alert(ev.currentTarget.id);
 }
@@ -155,6 +152,7 @@ const Items=(()=>{
 
     const [items,setItems]=React.useState([]);
     const [uoms,setUoms]=React.useState([]);
+    const [selectedUoms,setSelectedUoms]=React.useState([]);
     const [showProgress,setShowProgress]=React.useState(true);
     const [selectedItemCode,setSelectedItemCode]=React.useState(0);
 
@@ -288,23 +286,26 @@ const Items=(()=>{
 
 
     const ItemDetails=()=>{
-        const item=items.find(i=>i.code==selectedItemCode);
-        console.log(item);
+        const list=[];
+        getItemByCode(selectedItemCode).then((item)=>{
+            item.forEach((i)=>{
+        //const item=items.find(i=>i.code==selectedItemCode);
+        //console.log(item);
         const styleClasses=myStyles();
         return(
             <div className={styleClasses.detailsPanel}>
                 <div className={styleClasses.detailsContentLeft}>
                     <span className={styleClasses.itemHeading}>Item Details</span><br/>
-                    <span className={styleClasses.detailsContent}>Item Name : {item.name}</span><br/>
-                    <span className={styleClasses.detailsContent}>HSN Code : {item.hsnCode}</span><br/>
-                    <span className={styleClasses.detailsContent}>CGST : {item.cgst}</span><br/>
-                    <span className={styleClasses.detailsContent}>SGST : {item.sgst}</span><br/>
-                    <span className={styleClasses.detailsContent}>IGST : {item.igst}</span><br/>
+                    <span className={styleClasses.detailsContent}>Item Name : {i.name}</span><br/>
+                    <span className={styleClasses.detailsContent}>HSN Code : {i.hsnCode}</span><br/>
+                    <span className={styleClasses.detailsContent}>CGST : {i.cgst}</span><br/>
+                    <span className={styleClasses.detailsContent}>SGST : {i.sgst}</span><br/>
+                    <span className={styleClasses.detailsContent}>IGST : {i.igst}</span><br/>
                 </div>
                 <div className={styleClasses.detailsContentRight}>
                     <div className={styleClasses.uom} >
                         <span className={styleClasses.uomHeading}>Unit of Measurements</span><br/>
-                            
+                        
                     </div>
                 </div>
                 <AlertMessage
@@ -318,6 +319,8 @@ const Items=(()=>{
                 />
             </div>
         )
+        });
+    });
     }
     
     return (
