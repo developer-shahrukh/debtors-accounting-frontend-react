@@ -86,6 +86,14 @@ const ItemAddForm=(props)=>{
     const openItemDialog=()=>{
         setItemDialogState(true);
     }
+    const closeItemDialog=()=>{
+        setItemDialogState(false);
+        clearFormData();
+    }
+    const closeSnackbar=()=>{
+        setSnackbarOpenState(false);
+        setSnackbarMessage("");
+    }
     const clearFormData=()=>
     {
         setName("");
@@ -160,14 +168,7 @@ const ItemAddForm=(props)=>{
         console.log('After validation : '+hashError);
         return hashError;
     }
-    const closeItemDialog=()=>{
-        setItemDialogState(false);
-        clearFormData();
-    }
-    const closeSnackbar=()=>{
-        setSnackbarOpenState(false);
-        setSnackbarMessage("");
-    }
+    
     const addItem=()=>{
         clearAllErrors();
         var code=0;
