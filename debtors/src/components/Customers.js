@@ -390,7 +390,7 @@ const Customers=(()=>{
                 </DialogContent>
                 <DialogTitle>Registration Details</DialogTitle>
                 <DialogContent className={styleClasses.input}>
-                    <InputForm title="gst" value={gst} onChange={(ev)=>setGst(ev.target.value)} disabled={inputDisabled}/>
+                    <InputForm title="gst" value={gst} onChange={(ev)=>setGst(ev.target.value)} disabled={inputDisabled} />
                     <InputForm title="tin" value={tin} onChange={(ev)=>setTin(ev.target.value)} disabled={inputDisabled}/>
                     <InputForm title="other" value={other} onChange={(ev)=>setOther(ev.target.value)} disabled={inputDisabled}/>
                 </DialogContent>

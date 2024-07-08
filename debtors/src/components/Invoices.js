@@ -9,6 +9,7 @@ import DialogContent from '@material-ui/core/DialogContent';
 import DialogActions from '@material-ui/core/DialogActions';
 import TextField from '@material-ui/core/TextField';
 
+import AlertMessage from './AlertMessage';
 
 import TableContainer from '@material-ui/core/TableContainer';
 import TablePagination from '@material-ui/core/TablePagination';
@@ -18,7 +19,7 @@ import TableBody from '@material-ui/core/TableBody';
 import TableRow from '@material-ui/core/TableRow';
 import TableCell from '@material-ui/core/TableCell';
 import Checkbox from '@material-ui/core/Checkbox';
-import { FormControl, FormHelperText, Input, InputLabel, MenuItem, Select } from '@material-ui/core';
+import { FormControl, FormHelperText, Input, InputLabel, MenuItem, Select, TableFooter } from '@material-ui/core';
 import AccountCircleIcon from '@material-ui/icons/AccountCircle';
 import HomeIcon from '@material-ui/icons/Home';
 import PlaceIcon from '@material-ui/icons/Place';
@@ -139,20 +140,20 @@ const myStyles=makeStyles((theme)=>{
             margin:"10px"
         },
         innerContainer:{
-            height: "250px",
+            height: "300px",
             margin:"10px",
             border:"1px solid black",
             borderRadius: "40px"
         },
         rightSideContainer:{
-            height:"230px",   
+            height:"280px",   
             marginLeft:"50%",
             margin:"10px",
             border:"1px solid black",
-            borderRadius: "40px"
+            borderRadius: "40px",
         },
         leftSideContainer:{
-            height:"230px",
+            height:"280px",
             marginRight:"50%",
             margin:"10px",
             border: "1px solid black",
@@ -177,13 +178,16 @@ const myStyles=makeStyles((theme)=>{
             margin:"5px"
         },
         customerDetails:{
-            display:"flex"
+            marginLeft : "30px",
+            padding: "5px",
         },
         data:{
             fontWeight:"600",
             fontSize: "12pt",
             gap: "10px",
-            margin: "10px",
+            margin: "0.5em 0",
+            textAlign: "left",
+            
         },
         icons:{
             marginTop: "10px"
@@ -201,10 +205,19 @@ const Invoices=()=>{
     const [items,setItems]=React.useState([]);
     const[uoms,setUoms]=React.useState([]);
 
+    const [message,setMessage]=React.useState("");
+    const [openState,setOpenState]=React.useState(false);
+    const [alertType,setAlertType]=React.useState("");
+
+
     const [selectedCustomer,setSelectedCustomer]=React.useState("");
     const [isSameState,setIsSameState]=React.useState(true);
     const [rate,setRate]=React.useState("");
     const [quantity,setQuantity]=React.useState("");
+    
+    const [totalAmount,setTotalAmount]=React.useState(0);
+    const [totalTax,setTotalTax]=React.useState(0);
+    const [totalAmountWithTax,setTotalAmountWithTax]=React.useState(0);
 
     const [traderState,setTraderState]=React.useState("");
     const [customerState,setCustomerState]=React.useState("");
@@ -262,6 +275,13 @@ const Invoices=()=>{
         return selectedItems.indexOf(code)!=-1;
     }
 
+    const openAlert=()=>{
+        setOpenState(true);
+    }
+    const closeAlert=()=>{
+        setOpenState(false);
+    }
+
     const openItemDialog=()=>{
         setItemDialogState(true);
     }
@@ -284,18 +304,46 @@ const Invoices=()=>{
         setSelectedItems(selections);
     }
     
-    const addItem=(ev)=>{
-        alert(selectedItems+","+hsnCode+","+uom);
-        alert(cgst+","+igst+","+sgst);
-        alert(rate+","+quantity);
+    const addItem=()=>{
+        //alert(selectedItems+","+hsnCode+","+uom);
+        //alert(cgst+","+igst+","+sgst);
+        //alert(rate+","+quantity);
         var item=items.find(i=>i.code==selectedItems);
-        alert(item.name);
+        //alert(item.name);
         var u=uoms.find(u=>u.code==uom);
-        alert(u.name);
-        const itemList=[];
-        itemList.push({item,cgst,sgst,igst,u,rate,quantity});
-        setItemForTable(itemList);
+        //alert(u.name);
+        var name=item.name;
+        var uName=u.name;
+        var amount=rate*quantity;
+        var taxableAmount=amount*((cgst+sgst)/100);
+        
+        setTotalAmount(prevAmount=>(parseFloat(prevAmount)+parseFloat(amount)).toFixed(2));
+        setTotalTax(prevTax=>(parseFloat(prevTax)+parseFloat(taxableAmount)).toFixed(2));
+        var totalAmountWithTax=parseFloat(taxableAmount)+parseFloat(amount);
+        setTotalAmountWithTax(prevTotalAmountWithTax=>(parseFloat(prevTotalAmountWithTax)+parseFloat(totalAmountWithTax)).toFixed(2));
+        const newItem={name,hsnCode,uName,cgst,sgst,igst,rate,quantity,taxableAmount,amount};
+        //itemList.push({itemName,hsnCode,uName,cgst,sgst,igst,rate,quantity});
+        setItemForTable(prevItem=>[...prevItem,newItem]);
+        //console.log(itemList);
+        clearItemForm();
+        openAlert();
+        closeItemDialog();
+        setMessage(`Item added in table`);
+        setAlertType('success');
+        
     }
+
+    const clearItemForm=()=>{
+        setSelectedItems("");
+        setHsnCode("");
+        setSelectedUoms("");
+        setCgst("");
+        setSgst("");
+        setIgst("");
+        setRate("");
+        setQuantity("");
+    }
+
     const onTableRowClicked=(code)=>{
         var selections=[];
         var index=selectedItems.indexOf(code);
@@ -455,7 +503,7 @@ const Invoices=()=>{
                 <h1><AccountBalanceIcon/>Bank Details</h1>
                 {
                     traders.map((trader)=>{return(
-                        <div>
+                        <div className={styleClasses.customerDetails}>
                         <span className={styleClasses.data}>Bank Name : {trader.branchName}</span><br/>
                         <span className={styleClasses.data}>Account holder name : {trader.accountHolderName}</span><br/>
                         <span className={styleClasses.data}>Account Number: {trader.accountNumber}</span><br/>
@@ -505,23 +553,49 @@ const Invoices=()=>{
                     <TableBody>
                         {
                                 
-                            !itemForTable.length ? null : itemForTable.slice((pageNumber-1)*pageSize,(pageNumber-1)*pageSize+pageSize).map((item,index)=>{
-                                const selectionState=isItemSelected(selectedItems);
+                            !itemForTable.length ? <TableRow>
+                                <TableCell colspan={11} style={{textAlign:"center",fontWeight:"600",fontSize:"15pt"}}>No data available in table</TableCell>
+                            </TableRow> : itemForTable.slice((pageNumber-1)*pageSize,(pageNumber-1)*pageSize+pageSize).map((item,index)=>{
+                                //const selectionState=isItemSelected(selectedItems);
                                 return(
                                     <TableRow>
-                                        <TableCell><Checkbox checked={selectionState}/></TableCell>
-                                        <TableCell>{index+1}</TableCell>
-                                        <TableCell>{item.item.name}</TableCell>
+                                        <TableCell><Checkbox /></TableCell>
+                                        <TableCell align='right'>{index+1}</TableCell>
+                                        <TableCell>{item.name}</TableCell>
                                         <TableCell>{item.hsnCode}</TableCell>
-                                        <TableCell>{item.uom.name}</TableCell>
-                                        <TableCell>{item.cgst}</TableCell>
-                                        <TableCell>{item.sgst}</TableCell>
-                                        <TableCell>{item.igst}</TableCell>
+                                        <TableCell>{item.uName}</TableCell>
+                                        <TableCell>{item.rate}</TableCell>
+                                        <TableCell>{item.quantity}</TableCell>
+                                        <TableCell>{item.taxableAmount}</TableCell>
+                                        { isSameState ? (
+                                        <>
+                                            <TableCell>{item.cgst}%</TableCell>
+                                            <TableCell>{item.sgst}%</TableCell>
+                                        </> 
+                                        ) :
+                                            <TableCell>{item.igst}%</TableCell> 
+                                        }
+                                        <TableCell>{item.amount}</TableCell>
                                     </TableRow>
+                                    
                                 )
                             }) 
                         }
                     </TableBody>
+                    <TableFooter>
+                        <TableRow>
+                            <TableCell colspan={7} style={{color:"black",fontWeight:"400",fontSize: "13pt",textAlign:"right"}}>Total Tax</TableCell>
+                            <TableCell align='left' style={{color:"black",fontWeight:"600",fontSize: "10pt"}}>{totalTax}</TableCell>
+                        </TableRow>
+                        <TableRow>
+                            <TableCell colspan={10} style={{color:"black",fontWeight:"400",fontSize: "13pt",textAlign:"right"}}>Total Amount Without Tax</TableCell>
+                            <TableCell align='center' style={{color:"black",fontWeight:"600",fontSize: "10pt"}}>{totalAmount}</TableCell>
+                        </TableRow>
+                        <TableRow>
+                            <TableCell colspan={10} style={{color:"black",fontWeight:"400",fontSize: "13pt",textAlign:"right"}}>Total Amount With Tax</TableCell>
+                            <TableCell align='center' style={{color:"black",fontWeight:"600",fontSize: "10pt"}}>{totalAmountWithTax}</TableCell>
+                        </TableRow>
+                    </TableFooter>
                 </Table>
                 <TablePagination
              component="div"
@@ -541,8 +615,8 @@ const Invoices=()=>{
         return(
             <div>
                 {
-                    traders.length==0 ? <h1>Empty</h1> : traders.map((trader)=>{return(
-                        <div>
+                    traders.length==0 ? null : traders.map((trader)=>{return(
+                        <div className={styleClasses.customerDetails}>
                             <h3><AccountCircleIcon/>{trader.name}</h3>
                             <span className={styleClasses.data}><HomeIcon/>{trader.address}</span><br/>
                             <span className={styleClasses.data}>{trader.gst}</span><br/>
@@ -629,12 +703,12 @@ const Invoices=()=>{
                 <div className={styleClasses.rightSideContainer}>
                     <h1 className={styleClasses.invoice}>Invoice Number</h1>
                     <FormControl className={styleClasses.inputField}>
-                        <InputLabel for="invoice-number">Invoice Number</InputLabel>
+                        <InputLabel htmlFor="invoice-number">Invoice Number</InputLabel>
                         <Input className={styleClasses.input} id="invoice-number" name="invoice-number" type="text" />
                         <FormHelperText id="invoice-number-helper">Enter invoice number</FormHelperText>
                     </FormControl>
                     <FormControl className={styleClasses.inputField}>
-                        <InputLabel for="invoice-date">Invoice date</InputLabel>
+                        <InputLabel htmlFor="invoice-date">Invoice date</InputLabel>
                         <Input className={styleClasses.input} id="invoice-date" name="invoice-date" type="date" />
                         <FormHelperText id="invoice-date-helper">Enter invoice date</FormHelperText>
                     </FormControl>
@@ -646,6 +720,15 @@ const Invoices=()=>{
                     <TraderBankDetails/>
                 </div>
             </div>
+            <AlertMessage
+                openState={openState}
+                duration={3000}
+                horizontalAlignment="center"
+                verticalAlignment="bottom"
+                onClose={closeAlert}
+                alertType={alertType}
+                message={message}
+            />
         </div>
     )
 }
