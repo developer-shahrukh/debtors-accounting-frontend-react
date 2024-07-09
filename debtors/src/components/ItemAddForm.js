@@ -172,11 +172,10 @@ const ItemAddForm=(props)=>{
     const addItem=()=>{
         clearAllErrors();
         var code=0;
-       /* if(validateForm()){
-            console.log('Inner Validate Condition');
+        if(validateForm()){
             return;
-        }*/
-       console.log(props.openState,props.alertType,props.message)
+        }
+       //console.log(props.openState,props.alertType,props.message)
         var itemData={
             code : code,
             name : name,

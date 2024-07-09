@@ -129,9 +129,9 @@ const Traders =(()=>{
         getStates().then((states)=>{
             //console.log(states);
              setStates(states);
-             
+             fillForm();
          });
-         fillForm();
+         
     },[]);
 
     
@@ -141,10 +141,11 @@ const Traders =(()=>{
         setSelectedState(ev.target.value);
     }
     
-
+    
     const fillForm=()=>{
         traders.forEach((trader)=>{
            // console.log('Traders : '+trader);
+           if(!trader) return null;
             setName(trader.name);
             setAddress(trader.address);
             setSelectedState(trader.stateCode);
@@ -260,7 +261,6 @@ const Traders =(()=>{
                     <InputForm title="ifsc-code" required onChange={(ev)=>setIfscCode(ev.target.value)} value={ifscCode} disabled={inputDisabled} />
                     <InputForm title="branch-name" required onChange={(ev)=>setBranchName(ev.target.value)} value={branchName} disabled={inputDisabled} />
                 </DialogContent>
-                
             </div>
 
 

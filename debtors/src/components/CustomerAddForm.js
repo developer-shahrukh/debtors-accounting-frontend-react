@@ -30,8 +30,12 @@ const CustomerAddForm=(props)=>{
     const [snackbarOpenState,setSnackbarOpenState]=React.useState("");
     const [snackbarMessage,setSnackbarMessage]=React.useState("");
 
-    
-
+    const [nameError,setNameError]=React.useState("");
+    const [addressError,setAddressError]=React.useState("");    
+    const [stateError,setStateError]=React.useState("");
+    const[isName,setIsName]=React.useState(false);
+    const [isAddress,setIsAddress]=React.useState(false);
+    const [isState,setIsState]=React.useState(false);
     const stateChange=(ev)=>{
         setSelectedState(ev.target.value);
     }
@@ -64,10 +68,36 @@ const CustomerAddForm=(props)=>{
         setOfficeContact("");
     }
 
-
+    const clearAllErrors=()=>{
+        setNameError("");
+        setAddressError("");
+        setStateError("");
+        setIsName(false);
+        setIsAddress(false);
+        setIsState(false);
+    }
+    const validateForm=()=>{
+        var hashError=false;
+        if(!name || name.length==0){
+            hashError=true;
+            setIsName(true);
+            setNameError("Name required");
+        }
+        if(!address || !address.length){
+            hashError=true;
+            setIsAddress(true);
+            setAddressError("Address is compulsory");
+        }
+        return hashError;
+    }
 
     const customer=()=>{
-        if(name.length===0){
+        clearAllErrors();
+        var code=0;
+        if(validateForm()){
+            return;
+        }
+        /*if(name.length===0){
             props.setOpenState(true);
             props.setAlertType('warning');
             props.setMessage("Enter name")
@@ -78,10 +108,10 @@ const CustomerAddForm=(props)=>{
                 props.setAlertType('warning');
                 props.setMessage("Enter address")
                 return;
-            }
+            }*/
         if(selectedState==0){
             props.setOpenState(true);
-            props.setAlertType('warning');
+            props.setAlertType('error');
             props.setMessage("Select State");
             return;
         }
@@ -151,32 +181,31 @@ const CustomerAddForm=(props)=>{
                 <DialogTitle>Add customer Form</DialogTitle>
                 <DialogContent>
                     <TextField
-                        required
                         label="name"
+                        error={isName}
+                        helperText={nameError}
                         value={name}
                         onChange={(ev)=>{setName(ev.target.value);}}
                         fullWidth/>
                     <TextField
-                        required
+                        error={isAddress}
+                        helperText={addressError}
                         label="address"
                         value={address}
                         onChange={(ev)=>{setAddress(ev.target.value);}}
                         fullWidth/>
                     <TextField
-                        required
                         label="gst"
                         value={gst}
                         onChange={(ev)=>{setGst(ev.target.value);}}
                         fullWidth/>
 
                     <TextField
-                        required
                         label="tin"
                         value={tin}
                         onChange={(ev)=>{setTin(ev.target.value);}}
                         fullWidth/>
                     <TextField
-                        required
                         label="other"
                         value={other}
                         onChange={(ev)=>{setOther(ev.target.value);}}
@@ -198,7 +227,7 @@ const CustomerAddForm=(props)=>{
                         onChange={(ev)=>{setOfficeContact(ev.target.value);}}
                         fullWidth/>
                     <FormControl>
-                        <InputLabel id="state-select-label">States</InputLabel>
+                        <InputLabel id="state-select-label" >States</InputLabel>
                             <Select
                                 labelId="state-label"
                                 id="state"

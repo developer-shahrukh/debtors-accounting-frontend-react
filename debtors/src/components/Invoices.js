@@ -31,7 +31,7 @@ import ItemAddForm from './ItemAddForm';
 
 const getTraders=()=>{
     var promise=new  Promise((resolve,reject)=>{
-        fetch("/getTrader").then((response)=>{
+        fetch("/getTraders").then((response)=>{
             if(!response.ok) throw Error("Unable to fetch data,try after some time");
             return response.json();            
         }).then((traders)=>{
@@ -85,7 +85,7 @@ const getItems=()=>{
 }
 const getItemByCode=(code)=>{
     var promise=new  Promise((resolve,reject)=>{
-        fetch(`/getByCode?code=${code}`).then((response)=>{
+        fetch(`/getItem/${code}`).then((response)=>{
             if(!response.ok) throw Error("Unable to fetch data,try after some time");
             return response.json();            
         }).then((item)=>{
@@ -618,8 +618,10 @@ const Invoices=()=>{
         return(
             <div>
                 {
-                    !Array.isArray(traders) || !traders.length ? null : traders.map((trader)=>{
-                        if(!trader) return null;
+                    
+                    !Array.isArray(traders) || !traders.length ? null : traders.map((trader,index)=>{
+                        console.log(`Index ${index} :`,trader);
+                        if(!trader || !trader.name) return null;
                         return(                        
                         <div className={styleClasses.customerDetails}>
                             <h3><AccountCircleIcon/>{trader.name}</h3>
