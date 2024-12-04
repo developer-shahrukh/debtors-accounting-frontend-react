@@ -367,8 +367,8 @@ const Customers=(()=>{
                 </div>
                 <DialogTitle >Personal Information</DialogTitle>
                 <DialogContent className={styleClasses.input}>
-                    <InputForm title="name" value={name} onChange={(ev)=>setName(ev.target.value)} required disabled={inputDisabled}/>
-                    <InputForm title="address" value={address} onChange={(ev)=>setAddress(ev.target.value)} required disabled={inputDisabled}/>
+                    <InputForm title="Name" value={name} onChange={(ev)=>setName(ev.target.value)} required disabled={inputDisabled}/>
+                    <InputForm title="Address" value={address} onChange={(ev)=>setAddress(ev.target.value)} required disabled={inputDisabled}/>
                     <FormControl>
                         <InputLabel id="state-select-label">States</InputLabel>
                             <Select
@@ -390,15 +390,15 @@ const Customers=(()=>{
                 </DialogContent>
                 <DialogTitle>Registration Details</DialogTitle>
                 <DialogContent className={styleClasses.input}>
-                    <InputForm title="gst" value={gst} onChange={(ev)=>setGst(ev.target.value)} disabled={inputDisabled} />
-                    <InputForm title="tin" value={tin} onChange={(ev)=>setTin(ev.target.value)} disabled={inputDisabled}/>
-                    <InputForm title="other" value={other} onChange={(ev)=>setOther(ev.target.value)} disabled={inputDisabled}/>
+                    <InputForm title="Gst" value={gst} onChange={(ev)=>setGst(ev.target.value)} disabled={inputDisabled} />
+                    <InputForm title="Tin" value={tin} onChange={(ev)=>setTin(ev.target.value)} disabled={inputDisabled}/>
+                    <InputForm title="Other" value={other} onChange={(ev)=>setOther(ev.target.value)} disabled={inputDisabled}/>
                 </DialogContent>
                 <DialogTitle>Contact Details</DialogTitle>
                 <DialogContent className={styleClasses.input}>
-                <InputForm title="personal" value={personal} onChange={(ev)=>setPersonal(ev.target.value)} disabled={inputDisabled}/>
-                    <InputForm title="home" value={home} onChange={(ev)=>setHome(ev.target.value)} disabled={inputDisabled}/>
-                    <InputForm title="office" value={office} onChange={(ev)=>setOffice(ev.target.value)} disabled={inputDisabled}/>
+                <InputForm title="Personal" value={personal} onChange={(ev)=>setPersonal(ev.target.value)} disabled={inputDisabled}/>
+                    <InputForm title="Home" value={home} onChange={(ev)=>setHome(ev.target.value)} disabled={inputDisabled}/>
+                    <InputForm title="Office" value={office} onChange={(ev)=>setOffice(ev.target.value)} disabled={inputDisabled}/>
                 </DialogContent>
         
             </div>

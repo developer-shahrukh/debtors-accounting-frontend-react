@@ -181,7 +181,7 @@ const CustomerAddForm=(props)=>{
                 <DialogTitle>Add customer Form</DialogTitle>
                 <DialogContent>
                     <TextField
-                        label="name"
+                        label="Name"
                         error={isName}
                         helperText={nameError}
                         value={name}
@@ -190,39 +190,39 @@ const CustomerAddForm=(props)=>{
                     <TextField
                         error={isAddress}
                         helperText={addressError}
-                        label="address"
+                        label="Address"
                         value={address}
                         onChange={(ev)=>{setAddress(ev.target.value);}}
                         fullWidth/>
                     <TextField
-                        label="gst"
+                        label="Gst number"
                         value={gst}
                         onChange={(ev)=>{setGst(ev.target.value);}}
                         fullWidth/>
 
                     <TextField
-                        label="tin"
+                        label="Tin number"
                         value={tin}
                         onChange={(ev)=>{setTin(ev.target.value);}}
                         fullWidth/>
                     <TextField
-                        label="other"
+                        label="Other"
                         value={other}
                         onChange={(ev)=>{setOther(ev.target.value);}}
                         fullWidth/>
 
                     <TextField
-                        label="personal"
+                        label="Personal contact"
                         value={personalContact}
                         onChange={(ev)=>{setPersonalContact(ev.target.value);}}
                         fullWidth/>
                     <TextField
-                        label="home-contact"
+                        label="Home contact"
                         value={homeContact}
                         onChange={(ev)=>{setHomeContact(ev.target.value);}}
                         fullWidth/>
                     <TextField
-                        label="office-contact"
+                        label="Office contact"
                         value={officeContact}
                         onChange={(ev)=>{setOfficeContact(ev.target.value);}}
                         fullWidth/>

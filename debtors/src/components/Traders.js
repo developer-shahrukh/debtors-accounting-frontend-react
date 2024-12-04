@@ -120,10 +120,10 @@ const Traders =(()=>{
     React.useEffect(()=>{
         getTraders().then((traders)=>{
             //setTraders(traders);
-            //console.log(traders);
+            
             setTraders(traders);
             setInputDisabled(true);
-            
+            console.log(traders);   
             //traders.forEach(trader=>setTraders(trader));
         });
         getStates().then((states)=>{
@@ -144,7 +144,7 @@ const Traders =(()=>{
     
     const fillForm=()=>{
         traders.forEach((trader)=>{
-           // console.log('Traders : '+trader);
+           console.log('Traders : '+trader);
            if(!trader) return null;
             setName(trader.name);
             setAddress(trader.address);
@@ -219,8 +219,8 @@ const Traders =(()=>{
             <div className={styleClasses.content}>
                 <DialogTitle >Personal Information</DialogTitle>
                 <DialogContent className={styleClasses.input}>
-                    <InputForm title="name" value={name} onChange={(ev)=>setName(ev.target.value)} required disabled={inputDisabled}/>
-                    <InputForm title="address" value={address} onChange={(ev)=>setAddress(ev.target.value)} required disabled={inputDisabled}/>
+                    <InputForm title="Name" value={name} onChange={(ev)=>setName(ev.target.value)} required disabled={inputDisabled}/>
+                    <InputForm title="Address" value={address} onChange={(ev)=>setAddress(ev.target.value)} required disabled={inputDisabled}/>
                     
                     <FormControl>
                         <InputLabel id="state-select-label">States</InputLabel>
@@ -234,7 +234,7 @@ const Traders =(()=>{
                                 {
                                     states.map((state)=>{
                                         return(
-                                            <MenuItem id={state.code} value={state.code} selected>{state.name}</MenuItem>
+                                            <MenuItem key={state.code} id={state.code} value={state.code} selected>{state.name}</MenuItem>
                                         )
                                     })
                                 }
@@ -244,22 +244,22 @@ const Traders =(()=>{
                 </DialogContent>
                 <DialogTitle>Registration Details</DialogTitle>
                 <DialogContent className={styleClasses.input}>
-                    <InputForm title="gst" value={gst} onChange={(ev)=>setGst(ev.target.value)} disabled={inputDisabled}/>
-                    <InputForm title="tin" value={tin} onChange={(ev)=>setTin(ev.target.value)} disabled={inputDisabled}/>
-                    <InputForm title="other" value={other} onChange={(ev)=>setOther(ev.target.value)} disabled={inputDisabled}/>
+                    <InputForm title="Gst" value={gst} onChange={(ev)=>setGst(ev.target.value)} disabled={inputDisabled}/>
+                    <InputForm title="Tin" value={tin} onChange={(ev)=>setTin(ev.target.value)} disabled={inputDisabled}/>
+                    <InputForm title="Other" value={other} onChange={(ev)=>setOther(ev.target.value)} disabled={inputDisabled}/>
                 </DialogContent>
                 <DialogTitle>Contact Details</DialogTitle>
                 <DialogContent className={styleClasses.input}>
-                    <InputForm title="personal" value={personal} onChange={(ev)=>setPersonal(ev.target.value)} disabled={inputDisabled} />
-                    <InputForm title="home" value={home} onChange={(ev)=>setHome(ev.target.value)} disabled={inputDisabled} />
-                    <InputForm title="office" value={office} onChange={(ev)=>setOffice(ev.target.value)} disabled={inputDisabled} />
+                    <InputForm title="Personal Contact" value={personal} onChange={(ev)=>setPersonal(ev.target.value)} disabled={inputDisabled} />
+                    <InputForm title="Home Contact" value={home} onChange={(ev)=>setHome(ev.target.value)} disabled={inputDisabled} />
+                    <InputForm title="Office Contact" value={office} onChange={(ev)=>setOffice(ev.target.value)} disabled={inputDisabled} />
                 </DialogContent>
                 <DialogTitle >Bank Details</DialogTitle>
                 <DialogContent className={styleClasses.input}>
-                    <InputForm title="account-holder-name" required onChange={(ev)=>setAccountHolderName(ev.target.value)} value={accountHolderName} disabled={inputDisabled}/>
-                    <InputForm title="account-number" required onChange={(ev)=>setAccountNumber(ev.target.value)} value={accountNumber} disabled={inputDisabled}/>
-                    <InputForm title="ifsc-code" required onChange={(ev)=>setIfscCode(ev.target.value)} value={ifscCode} disabled={inputDisabled} />
-                    <InputForm title="branch-name" required onChange={(ev)=>setBranchName(ev.target.value)} value={branchName} disabled={inputDisabled} />
+                    <InputForm title="Account holder name" required onChange={(ev)=>setAccountHolderName(ev.target.value)} value={accountHolderName} disabled={inputDisabled}/>
+                    <InputForm title="Account number" required onChange={(ev)=>setAccountNumber(ev.target.value)} value={accountNumber} disabled={inputDisabled}/>
+                    <InputForm title="Ifsc code" required onChange={(ev)=>setIfscCode(ev.target.value)} value={ifscCode} disabled={inputDisabled} />
+                    <InputForm title="Branch name" required onChange={(ev)=>setBranchName(ev.target.value)} value={branchName} disabled={inputDisabled} />
                 </DialogContent>
             </div>
 
