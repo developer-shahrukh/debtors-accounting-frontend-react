@@ -396,9 +396,9 @@ const Customers=(()=>{
                 </DialogContent>
                 <DialogTitle>Contact Details</DialogTitle>
                 <DialogContent className={styleClasses.input}>
-                <InputForm title="Personal" value={personal} onChange={(ev)=>setPersonal(ev.target.value)} disabled={inputDisabled}/>
-                    <InputForm title="Home" value={home} onChange={(ev)=>setHome(ev.target.value)} disabled={inputDisabled}/>
-                    <InputForm title="Office" value={office} onChange={(ev)=>setOffice(ev.target.value)} disabled={inputDisabled}/>
+                <InputForm title="Personal Contact" value={personal} onChange={(ev)=>setPersonal(ev.target.value)} disabled={inputDisabled}/>
+                    <InputForm title="Home Contact" value={home} onChange={(ev)=>setHome(ev.target.value)} disabled={inputDisabled}/>
+                    <InputForm title="Office Contact" value={office} onChange={(ev)=>setOffice(ev.target.value)} disabled={inputDisabled}/>
                 </DialogContent>
         
             </div>

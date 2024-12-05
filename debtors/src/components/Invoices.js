@@ -83,18 +83,19 @@ const getItems = () => {
     });
     return promise;
 }
-const getItemByCode = (code) => {
-    var promise = new Promise((resolve, reject) => {
-        fetch(`/getItem/${code}`).then((response) => {
-            if (!response.ok) throw Error("Unable to fetch data,try after some time");
-            return response.json();
-        }).then((item) => {
-            resolve(item);
-        }).catch((error) => {
-            reject(error);
-        });
-    });
-    return promise;
+const getItemByCode = async (code) => {
+    try {
+        const response = await fetch(`/getItem/${code}`);
+        if (!response.ok) {
+            console.log(response.status,response.statusText);
+            throw Error("Unable to fetch data,try after some time");
+        }
+        const item = await response.json();
+        return item;
+    } catch (error) {
+        throw error;
+    }
+
 }
 
 const getUoms = () => {
@@ -258,8 +259,8 @@ const Invoices = () => {
             console.log(traders);
             setTraders(traders);
         });
-        getStates().then((states) => {
-            setStates(states);
+        getStates().then((state) => {
+            setStates(state);
         });
         getCustomers().then((customers) => {
             setCustomers(customers);
@@ -618,17 +619,15 @@ const Invoices = () => {
                 {
 
                     !Array.isArray(traders) || !traders.length ? null : traders.map((trader, index) => {
-                        console.log(`Index ${index} :`, trader);
-                        //const stateCode=trader.stateCode;
-                        //const stateDetails=findState(stateCode);                        
-                        
+                        //console.log(`Index ${index} :`, trader);
+                        const stateCode = trader.stateCode;
                         if (!trader || !trader.name) return null;
                         return (
                             <div className={styleClasses.customerDetails}>
                                 <h3><AccountCircleIcon />{trader.name}</h3>
                                 <span className={styleClasses.data}><HomeIcon />{trader.address}</span><br />
                                 <span className={styleClasses.data}>{trader.gst}</span><br />
-                                <span className={styleClasses.data}><PlaceIcon />{findState(trader.stateCode).name} </span><br />
+                                <span className={styleClasses.data}><PlaceIcon />{states.length > 0 && findState(stateCode) ? findState(stateCode).name : "State not found"} </span><br />
                                 <span className={styleClasses.data}><CallIcon />{trader.contact1}</span>&nbsp;&nbsp;
                                 <span className={styleClasses.data}>{trader.contact2}</span>&nbsp;&nbsp;
                                 <span className={styleClasses.data}>{trader.contact3}</span><br />
