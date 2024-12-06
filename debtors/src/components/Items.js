@@ -188,12 +188,7 @@ const Items=(()=>{
 
     const deleteItem=(ev)=>{
         var code=ev.currentTarget.id;
-        console.log('delete click '+code);
-        console.log(items);    
-        fetch(`deleteItem/${code}`,{
-            method: "DELETE",
-        })
-        .then((response)=>{
+        fetch(`deleteItemByCode?code=${code}`).then((response)=>{
             if(response.ok){
                setItems(items.filter(item=>item.code!=code));
             }
@@ -291,7 +286,7 @@ const Items=(()=>{
         const item=items.find(i=>i.code==selectedItemCode);
         console.log(item);
         const styleClasses=myStyles();
-        return(
+        return !item || !item.name ? null : 
             <div className={styleClasses.detailsPanel}>
                 <div className={styleClasses.detailsContentLeft}>
                     <span className={styleClasses.itemHeading}>Item Details</span><br/>
@@ -317,7 +312,7 @@ const Items=(()=>{
                     message={message}
                 />
             </div>
-        )
+        
     }
     
     return (

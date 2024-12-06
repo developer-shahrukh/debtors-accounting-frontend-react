@@ -73,8 +73,9 @@ const getTraders = async () => {
 const getStates=async ()=>{
     try {
         const response=await fetch("/getStates");
-        if(!response.ok) throw Error("Unable to fetch data,try after some time");
         const states=await response.json();
+        if(!response.ok) throw Error("Unable to fetch data,try after some time");
+    console.log('states '+states);
         return states;
     } catch(error){
         throw error;
@@ -113,9 +114,14 @@ const Traders = (() => {
     const styleClasses = myStyles();
 
     React.useEffect(() => {
-        Promise.all([getTraders(), getStates()]).then((traders, states) => {
+        Promise.all([getTraders(), getStates()]).then(([traders, states]) => {
+            console.log(`After fetching traders dataaaa : ${traders}`);
+            console.log(`After fetching state dataaaa : ${states}`);
             setTraders(traders);
             setStates(states);
+            console.log(`After fetching data : ${states}`);
+            console.log(`After fetching traders data : ${traders}  `+JSON.stringify(traders));
+            
             fillForm();
             setInputDisabled(true);
         }).catch((error) => {
@@ -123,6 +129,10 @@ const Traders = (() => {
         });
     }, []);
 
+    React.useEffect(() => {
+        console.log("Traders state updated:", traders);
+        fillForm();
+    }, [traders]);
 
 
     const stateChange = (ev) => {
@@ -131,7 +141,9 @@ const Traders = (() => {
     }
 
 
+
     const fillForm = () => {
+        console.log('Fill form called'+JSON.stringify(traders));
         traders.forEach((trader) => {
             console.log('Traders : ' + trader);
             if (!trader) return null;
