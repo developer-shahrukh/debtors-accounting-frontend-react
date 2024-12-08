@@ -5,6 +5,7 @@ import Customers from "./components/Customers";
 import Traders from './components/Traders';
 import Invoices from './components/Invoices';
 import Menu from './components/Menu';
+import Index from './components/index';
 import { BrowserRouter as Router, Route, Routes, Navigate } from 'react-router-dom';
 const App = () => {
     return (
@@ -12,6 +13,7 @@ const App = () => {
             <div  style={{ paddingBottom: '60px' }}>
                 <Header/>
                 <Routes>
+                    <Route path='/Index' element={<Index/>} />
                     <Route path='Items' element={<Items />} />
                     <Route path='Customers' element={<Customers />} />
                     <Route path='Traders' element={<Traders />} />

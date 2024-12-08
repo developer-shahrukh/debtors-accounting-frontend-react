@@ -87,6 +87,7 @@ const ItemAddForm = (props) => {
         setItemDialogState(true);
     }
     const closeItemDialog = () => {
+        console.log("Cancel add form");
         setItemDialogState(false);
         clearFormData();
     }
@@ -193,6 +194,7 @@ const ItemAddForm = (props) => {
     }
 
     const addItem = () => {
+        console.log("Add Item requiest");
         clearAllErrors();
         var code = 0;
         if (validateForm()) {
@@ -215,7 +217,9 @@ const ItemAddForm = (props) => {
             },
             body: JSON.stringify(itemData)
         }).then((response) => {
+            console.log("if response");
             if (response.ok) {
+                console.log("Item with response : "+response);
                 console.log(response);
                 setItemDialogState(true);
                 props.openAlert();

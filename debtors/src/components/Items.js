@@ -251,7 +251,7 @@ const Items=(()=>{
                         {items.length==0 ? <TableCell colSpan={5} style={{color:"red",textAlign:"center",fontSize:"26pt",background:"#e0d2ab",borderRadius:"40px"}}>Oops! No Record Found</TableCell>:
                         items.slice((pageNumber-1)*pageSize,(pageNumber-1)*pageSize+pageSize).map((item,idx)=>{
                             return(
-                                <TableRow className={styleClasses.tableData} onClick={ItemSelected} id={item.code}>
+                                <TableRow className={styleClasses.tableData} onClick={ItemSelected} id={item.code} key={item.code}>
                                     <TableCell align='right'>{(pageNumber-1)*pageSize+(idx+1)}</TableCell>
                                     <TableCell>{item.name}</TableCell>
                                     <TableCell>{item.hsnCode}</TableCell>
