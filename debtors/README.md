@@ -47,6 +47,15 @@ To learn React, check out the [React documentation](https://reactjs.org/).
 
 ### Screenshots
 ![Alt Item](./assets/ItemDetails.png)
+![Alt Item add form](./assets/ItemAdd.png)
+![Alt Customer](./assets/Customer.png)
+![Alt Customer Add](./assets/CustomerAdd.png)
+![Alt Customer Details](./assets/CustomerDetails.png)
+![Alt Invoice 1](./assets/Invoice1.png)
+![Alt Invoice 2](./assets/Invoice2.png)
+![Alt Invoice 3](./assets/Invoice3.png)
+![Alt Trader](./assets/Trader.png)
+![Alt Trader Edit](./assets/TraderEdit.png)
 
 ### Code Splitting
 
